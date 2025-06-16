@@ -1,0 +1,210 @@
+import random
+
+def clear():
+    for i in range(30):
+        print()
+
+# Setting up
+names = ['Red', 'Blue', 'Squishy', 'Legend', 'Fattish', 'Unreal', 'Yik', 'Duck']
+
+canCharge = 0
+recoverAmount = 2
+chargeDamage = 2
+enemyOneDamage = 0
+enemyTwoDamage = 0
+extraDamage = 0
+action = ''
+enemySpecial = 0
+damage = 0
+attackWho = ''
+attackType = ''
+enemyOne = names[random.randint(0, len(names) - 1)]
+enemyTwo = names[random.randint(0, len(names) - 1)]
+while enemyTwo == enemyOne:
+    enemyTwo = names[random.randint(0, len(names) - 1)]
+enemyOneHealth = random.randint(5,15)
+enemyTwoHealth = 20 - enemyOneHealth
+health = 15
+name = input("What is your name? ")
+name = name[0].upper() + name[1:].lower()
+
+# Setting up ^^^
+
+clear()
+
+# Instructions
+print("Defending reduces damage taken on the next turn by 50%.")
+print(f"Charging increases damage dealt on the next attack by {chargeDamage}, but can't be used again on the next turn.")
+print(f"Recovering restores {recoverAmount} HP.")
+print("\nBall does 2 damage 50% of the time, otherwise 1.")
+print("Sword does 3 damage 50% of the time, otherwise 0 damage.")
+print("\nIf one enemy dies, the other gains +1 damage.")
+input("\nPress ENTER to continue.")
+clear()
+if enemyOne == 'Red' and enemyTwo == 'Blue' or enemyOne == 'Blue' and enemyTwo == 'Red':
+    print("Red n' Blue stand in your way.\n")
+else:
+    print(f"{enemyOne} and {enemyTwo} stand in your way.\n")
+print(f"{enemyOne} has {enemyOneHealth} HP.")
+print(f"{enemyTwo} has {enemyTwoHealth} HP.\n")
+print(f"{name} has {health} HP.\n")
+
+# Instructions ^^^
+
+
+while True:
+
+    attackWho = ''
+    attackType = ''
+    action = ''
+    damage = 0
+    enemyOneDamage = 0
+    enemyTwoDamage = 0
+
+    if canCharge == 0:
+        while action != 'attack' and action != 'defend' and action != 'charge' and action != 'recover':
+            action = input("Attack, Defend, Charge, or Recover? ").lower()
+
+    else:
+        while action != 'attack' and action != 'defend' and action != 'recover':
+            action = input("Attack, Defend, or Recover? ").lower()
+
+    canCharge = 0
+
+    # Attack
+    if action == 'attack':
+
+        if enemyOneHealth == 0 :
+            attackWho = enemyTwo.lower()
+        elif enemyTwoHealth == 0:
+            attackWho = enemyOne.lower()
+        else:
+            while attackWho != enemyOne.lower() and attackWho != enemyTwo.lower():
+                attackWho = input(f"Attack {enemyOne} or {enemyTwo}? ").lower()
+
+        while attackType != 'ball' and attackType != 'sword':
+            attackType = input(f"Attack {attackWho[0].upper()}{attackWho[1:].lower()} with Ball or Sword? ").lower()
+
+
+        clear()
+
+        if attackType == 'ball':
+            if random.randint(0,1) == 0:
+                damage = 2
+            else:
+                damage = 1
+        elif attackType == 'sword':
+            if random.randint(0,1) == 0:
+                damage = 3
+            else:
+                damage = 0
+        else:
+            print("\nError: attackType != ball or sword")
+            print(attackType + '\n')
+            # Error
+
+        print(f"{name} attacked {attackWho[0].upper()}{attackWho[1:].lower()} with {attackType[0].upper()}{attackType[1:].lower()}!")
+    # Attack ^^^
+
+    # Defend
+    elif action == 'defend':
+        clear()
+        print(f"{name} defended.\n")
+    # Defend ^^^
+
+    # Charge
+    elif action == 'charge':
+        clear()
+        extraDamage += chargeDamage
+        print(f"{name} charged {extraDamage} damage.\n")
+        canCharge = 1
+    # Charge ^^^
+
+    # Recover
+    if action == 'recover':
+        clear()
+        health += recoverAmount
+        print(f"{name} recovered.\nRestored {recoverAmount} HP.\n")
+    # Recover ^^^
+
+    if extraDamage != 0 and action == 'attack':
+        damage += extraDamage
+        extraDamage = 0
+
+    # Checking if enemies have less than 0 HP
+    if attackWho == enemyOne.lower():
+        enemyOneHealth -= damage
+        if enemyOneHealth < 0:
+            enemyOneHealth = 0
+
+    elif attackWho == enemyTwo.lower():
+        enemyTwoHealth -= damage
+        if enemyTwoHealth < 0:
+            enemyTwoHealth = 0
+    # Checking if enemies have less than 0 HP ^^^
+    elif action == 'attack':
+        print("\nError: attackWho != enemyOne or enemyTwo")
+        print(attackWho + '\n')
+        # Error
+
+
+    if damage == 0 and action == 'attack':
+        print("Attack failed!\n")
+    elif action == 'attack':
+        print(f"Dealt {damage} damage!\n")
+
+    # Enemy attack
+    if enemyOneHealth != 0:
+        if enemyTwoHealth == 0 and enemySpecial == 0:
+            print(f"{enemyOne} has charged up!")
+            enemySpecial = 1
+        print(f"{enemyOne} used stab!")
+        if random.randint(0,3) == 0:
+            print("Attack failed!")
+        elif enemyTwoHealth == 0:
+            enemyOneDamage += 2
+            print(f"{enemyOne} dealt {enemyOneDamage} damage to {name}.")
+        else:
+            enemyOneDamage += 1
+            print(f"{enemyOne} dealt {enemyOneDamage} damage to {name}.")
+    print()
+    if enemyTwoHealth != 0:
+        if enemyOneHealth == 0 and enemySpecial == 0:
+            print(f"{enemyTwo} has charged up!")
+            enemySpecial = 1
+        print(f"{enemyTwo} used stab!")
+        if random.randint(0,3) == 0:
+            print("Attack failed!")
+        elif enemyOneHealth == 0:
+            enemyTwoDamage += 2
+            print(f"{enemyTwo} dealt {enemyTwoDamage} damage to {name}.")
+        else:
+            enemyTwoDamage += 1
+            print(f"{enemyTwo} dealt {enemyTwoDamage} damage to {name}.")
+
+    if action == 'defend':
+        health = round(health - (enemyOneDamage + enemyTwoDamage) / 2)
+    else:
+        health = health - (enemyOneDamage + enemyTwoDamage)
+
+    print()
+    # Enemy attack ^^^
+
+    if health <= 0:
+        health = 0
+
+    if enemyOneHealth != 0:
+        print(f"{enemyOne} has {enemyOneHealth} HP.")
+    if enemyTwoHealth != 0:
+        print(f"{enemyTwo} has {enemyTwoHealth} HP.\n")
+    print(f"{name} has {health} HP.\n")
+
+    # Win/Lose conditions
+    if enemyOneHealth == 0 and enemyTwoHealth == 0:
+        print("You win!")
+        exit()
+
+    if health == 0:
+        print("You lose.")
+        exit()
+    # Win/Lose conditions ^^^
